@@ -1,0 +1,23 @@
+{
+  "name": "azuredevops-dashboard-copytool",
+  "version": "1.0.0",
+  "description": "A CLI tool for copying dashboards in azure devops",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "/bin/node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/assafushy/azureDevOPs-DashBoard-CopyTool.git"
+  },
+  "author": "Assaf Yacobi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/assafushy/azureDevOPs-DashBoard-CopyTool/issues"
+  },
+  "homepage": "https://github.com/assafushy/azureDevOPs-DashBoard-CopyTool#readme",
+  "dependencies": {
+    "axios": "^0.18.0"
+  }
+}
