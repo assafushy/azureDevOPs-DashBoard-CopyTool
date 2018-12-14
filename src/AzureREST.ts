@@ -13,6 +13,5 @@ export default class AzureREST{
 async getProjectList(){ 
   return axios.get(`${this.rootUrl}/_apis/projects`);
 }//getProjectList
-
   
 }

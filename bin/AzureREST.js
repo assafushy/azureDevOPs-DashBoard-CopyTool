@@ -38,31 +38,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var AzureREST_1 = __importDefault(require("./AzureREST"));
-var Main_1 = __importDefault(require("./Main"));
-var restClient = new AzureREST_1.default("https://assafushy.visualstudio.com", "7ne3n2b4uzgux46bkjvofdz7lsz2kbb4nm34ai45jiztdichxeta");
-function fetchTeamProjectList() {
-    return __awaiter(this, void 0, void 0, function () {
-        var res, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, restClient.getProjectList()];
-                case 1:
-                    res = _a.sent();
-                    return [3 /*break*/, 3];
-                case 2:
-                    error_1 = _a.sent();
-                    console.error("Error fetching TeamProjects - please check --  baseURL and your PAT");
-                    return [3 /*break*/, 3];
-                case 3:
-                    console.log(res.data.value);
-                    return [2 /*return*/];
-            }
+var axios_1 = __importDefault(require("axios"));
+var AzureREST = /** @class */ (function () {
+    function AzureREST(rootUrl, PAT) {
+        this.rootUrl = rootUrl;
+        axios_1.default.defaults['auth'] = { "username": '', "password": PAT };
+    }
+    //fetches all teamProjects
+    AzureREST.prototype.getProjectList = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, axios_1.default.get(this.rootUrl + "/_apis/projects")];
+            });
         });
-    });
-}
-var mainThread = new Main_1.default();
-mainThread.main();
-// fetchTeamProjectList();
+    }; //getProjectList
+    return AzureREST;
+}());
+exports.default = AzureREST;

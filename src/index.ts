@@ -1,5 +1,5 @@
-import azureREST from './azureDevOpsREST';
-
+import azureREST from './AzureREST';
+import Main from './Main';
 
 let restClient : azureREST = new azureREST("https://assafushy.visualstudio.com","7ne3n2b4uzgux46bkjvofdz7lsz2kbb4nm34ai45jiztdichxeta");
 
@@ -13,4 +13,7 @@ async function fetchTeamProjectList(){
   console.log(res.data.value);
 }
 
-fetchTeamProjectList();
+let mainThread = new Main();
+mainThread.main();
+// fetchTeamProjectList();
+ 
