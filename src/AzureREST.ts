@@ -19,4 +19,15 @@ async getDashboardList(projectName : string){
   //?api-version=5.0-preview.2
   return axios.get(`${this.rootUrl}/${projectName}/_apis/dashboard/dashboards`);
 }//getProjectList
-}
+
+//fetch  dashboard data by id
+async getDashboardData(projectName :string ,dashboardId : string){ 
+  return axios.get(`${this.rootUrl}/${projectName}/_apis/dashboard/dashboards/${dashboardId}`);
+}//getProjectList
+
+//creates a dashboard
+async createDashboard(projectName :string ,dashboardObject : any){ 
+  return axios.post(`${this.rootUrl}/${projectName}/_apis/dashboard/dashboards?api-version=4.1-preview.2`,dashboardObject);
+}//getProjectList
+
+}//class

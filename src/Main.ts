@@ -51,7 +51,7 @@ async getConnectionData(){
   }
 }//getConnectionData
 
-//connect to azureDevOps
+//connect to azureDevOps and get project list
 async connectToAzureDevops(rootUrl : string,PAT : string){
   let res : any;
   this.restClient = new azureREST(rootUrl,PAT);
@@ -63,114 +63,105 @@ async connectToAzureDevops(rootUrl : string,PAT : string){
     return res.data.value;
 }//connectToAzureDevops
 
-//get project list
-async selectATeamProject(projectList : any ){ 
-  //select relavnt project to copy from
-  let selectedProject : any;
-  let config : any; 
-  let answer = await inquirer.prompt([{"type":"list","name":"selectType",
-  "message":"How do you want to pass your connection data ?",
-  "choices":["Select from list","JSON Config file"]}]);
-  switch(answer.selectType){
-    case 'Select from list':{
-      let projectNames : any = await Promise.all(projectList.map((project : any)=>{return project.name}));
-      //if via manual select from list
-      selectedProject = await inquirer.prompt([{"type":"list","name":"selectedProject",
-      "message":"Please select a project to copy from:",
-      "choices":projectNames}]);
-      return(selectedProject.selectedProject);
-    break;
-    }
-    case 'JSON Config file':{
-      //if via config file
-      console.log(`make sure you suppliy a JSON file path with properties: {projectName:****}`);
-      let configPath = await inquirer.prompt([{"type":"input","name":"configPath",
-          "message":"Please type the path of the config file:"}]);
-      if(configPath.configPath){config = require(configPath.configPath)}
-      if(config.projectName){
-        let projectCheck = _.findIndex(projectList,(o : any)=>{return o.name === config.projectName});
-        if(projectCheck>=0){
-          return(config.projectName);
-        }else{
-          console.error('Please fix your config file');  
-        }
-      }else{
-        console.error('Please fix your config file');
-      }
-    break;
-    }
-    default:
-    break;
-  }
-}//selectATeamProject
-
 //get dashboard list
 async getDashboardList(projectName : string){
   let res : any;
-      try{
-         res = await this.restClient.getDashboardList(projectName);
-      }catch(error){
-        console.error("Error fetching TeamProjects - please check --  baseURL and your PAT");
-      }
-      console.log(res.data);
-}
-//select relavnt dashboard to copy from
-async selectFromList(list : any, TypeToSelect : string ){ 
-  //select relavnt project to copy from
-  let selected : any;
-  let config : any; 
+  try{
+      res = await this.restClient.getDashboardList(projectName);
+  }catch(error){
+    console.error("Error fetching TeamProjects - please check --  baseURL and your PAT");
+  }
+  return res.data.dashboardEntries;
+}//getDashboardList
+
+//get dashboard list
+async getDashboardData(projectName : string,dashboardId :string){
+  let res : any;
+  try{
+      res = await this.restClient.getDashboardData(projectName,dashboardId);
+  }catch(error){
+    console.error("Error fetching TeamProjects - please check --  baseURL and your PAT");
+  }
+  return res.data;
+}//getDashboardList
+
+//copy dashboard
+async copyDashboard(projectToName : string , dashboardObject : any){
+  let res : any;
+  delete dashboardObject.id;
+
+  try{
+      res = await this.restClient.createDashboard(projectToName,dashboardObject);
+  }catch(error){
+    console.error("Error fetching TeamProjects - please check --  baseURL and your PAT");
+    console.log(error.response);
+  }//try
+}//copyDashboard
+
+async inputfromSelect(){
   let answer = await inquirer.prompt([{"type":"list","name":"selectType",
   "message":"How do you want to pass your connection data ?",
   "choices":["Select from list","JSON Config file"]}]);
   switch(answer.selectType){
     case 'Select from list':{
-      let titles : any = await Promise.all(list.map((item : any)=>{return item.name}));
-      //if via manual select from list
-      selected = await inquirer.prompt([{"type":"list","name":"selected",
-      "message":`Please select a ${TypeToSelect} to copy from:`,
-      "choices":titles}]);
-      let i = _.findIndex(list,(item : any)=>{return item.name === selected.selected})
-      return(list[i]);
-    break;
+      return 'list';
     }
     case 'JSON Config file':{
-      //if via config file
-      let configPath = await inquirer.prompt([{"type":"input","name":"configPath",
-          "message":"Please type the path of the config file:"}]);
-      if(configPath.configPath){config = require(configPath.configPath)}
-      if(config.projectName){
-        let i = _.findIndex(list,(o : any)=>{return o.name === config.dashboardName});
-        if(i>=0){
-          return(list[i]);
-        }else{
-          console.error('Please fix your config file');  
-        }
-      }else{
-        console.error('Please fix your config file');
-      }
-    break;
+      console.log(`Please make sure before you proceed, that your config file cantains the following properties:
+      {
+        projectFrom:<your project to copy from name>,
+        dashboardFrom:<your dashboard or dashboards to copy from name>
+      } `);
+      return 'json';
     }
-    default:
-    break;
-  }
+  }//switch
+}//inputfromSelect
+
+//select relavnt item from list
+async selectFromList(list : any, actionToSelect : string){ 
+  let selected : any;
+  let titles : any = await Promise.all(list.map((item : any)=>{return item.name}));
+  selected = await inquirer.prompt([{"type":"list","name":"selected",
+  "message":`Please select a ${actionToSelect}`,
+  "choices":titles}]);
+  let i = _.findIndex(list,(item : any)=>{return item.name === selected.selected})
+  return(list[i]);   
 }//selectFromList
-  //if via config file
-  //if via manual select from list
 
-//select relavnt project to copy from
-  //if via config file
-  //if via manual select from list
+async runBaseOnConfigFIle(){
+  //  //if via config file
+  //  let configPath = await inquirer.prompt([{"type":"input","name":"configPath",
+  //  "message":"Please type the path of the config file:"}]);
+  // if(configPath.configPath){config = require(configPath.configPath)}
+  // if(config.projectName){
+  // let i = _.findIndex(list,(o : any)=>{return o.name === config.dashboardName});
+  // if(i>=0){
+  //  return(list[i]);
+  // }else{
+  //  console.error('Please fix your config file');  
+  // }
+  // }else{
+  // console.error('Please fix your config file');
+  // }
+}//runBaseOnConfigFIle
 
-//copy dashboard
 
 async main(){
   await this.printappHeader("DashBoard - Copy Tool");
   let azureParams : any = await this.getConnectionData(); 
   let projectList = await this.connectToAzureDevops(azureParams.baseUrl,azureParams.PAT);
-  let selectedProject = await this.selectATeamProject(projectList);
-  let dashBoardList = await this.getDashboardList(selectedProject);
-  let selectedDashboard = await this.selectFromList(dashBoardList,'dashboard');
-  console.log(`selected ${selectedDashboard}`);
-}
+  let inputFrom = await this.inputfromSelect();
+  if(inputFrom === 'list'){
+    let selectedProjectFrom = await this.selectFromList(projectList,'project to copy from:' );
+    let dashBoardList = await this.getDashboardList(selectedProjectFrom.name);
+    let selectedDashboard = await this.selectFromList(dashBoardList,'dashboard to copy:');
+    let dashBoardDetails = await this.getDashboardData(selectedProjectFrom.name,selectedDashboard.id);
+    let selectedProjectTo = await this.selectFromList(projectList,'project to copy from:' );
+    await this.copyDashboard(selectedProjectTo.name,dashBoardDetails);
+    console.log(`Thanks for using if you like please add a star on github`);
+  }else{
+    //run base on config file
+  }//if
+}//main
 
-}
+}//class

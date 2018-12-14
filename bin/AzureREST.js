@@ -61,6 +61,22 @@ var AzureREST = /** @class */ (function () {
             });
         });
     }; //getProjectList
+    //fetch  dashboard data by id
+    AzureREST.prototype.getDashboardData = function (projectName, dashboardId) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, axios_1.default.get(this.rootUrl + "/" + projectName + "/_apis/dashboard/dashboards/" + dashboardId)];
+            });
+        });
+    }; //getProjectList
+    //creates a dashboard
+    AzureREST.prototype.createDashboard = function (projectName, dashboardObject) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, axios_1.default.post(this.rootUrl + "/" + projectName + "/_apis/dashboard/dashboards?api-version=4.1-preview.2", dashboardObject)];
+            });
+        });
+    }; //getProjectList
     return AzureREST;
-}());
+}()); //class
 exports.default = AzureREST;
