@@ -52,6 +52,15 @@ var AzureREST = /** @class */ (function () {
             });
         });
     }; //getProjectList
+    //fetch all dashboards for a team project
+    AzureREST.prototype.getDashboardList = function (projectName) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                //?api-version=5.0-preview.2
+                return [2 /*return*/, axios_1.default.get(this.rootUrl + "/" + projectName + "/_apis/dashboard/dashboards")];
+            });
+        });
+    }; //getProjectList
     return AzureREST;
 }());
 exports.default = AzureREST;
