@@ -228,7 +228,7 @@ var Main = /** @class */ (function () {
                     case 1:
                         titles = _a.sent();
                         return [4 /*yield*/, inquirer.prompt([{ "type": "list", "name": "selected",
-                                    "message": "Please select a " + actionToSelect,
+                                    "message": actionToSelect,
                                     "choices": titles }])];
                     case 2:
                         selected = _a.sent();
@@ -238,6 +238,43 @@ var Main = /** @class */ (function () {
             });
         });
     }; //selectFromList
+    Main.prototype.createNewDashboardObject = function (dashboardObject) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                //iterate Dashboards Widgets
+                dashboardObject.widgets.forEach(function (widget) {
+                    //get Settings property
+                    console.log("\n widget setting:");
+                    console.log(widget.settings);
+                    //all known cases:
+                    console.log(widget.settings.queryId);
+                    if (widget.settings.queryId) {
+                        console.log("found queryId: " + widget.settings.queryId);
+                    } //if
+                    if (widget.settings.query) {
+                        if (widget.settings.query.queryId) {
+                            console.log("found query.queryId: " + widget.settings.query.queryId);
+                        } //if
+                    } //if
+                    if (widget.settings.groupKey) {
+                        console.log("found groupKey: " + widget.settings.groupKey);
+                    } //if
+                    if (widget.settings.transformOptions) {
+                        if (widget.settings.transformOptions.filter) {
+                            console.log("found transformOptions.filter: " + widget.settings.transformOptions.filter);
+                        } //if
+                    } //if
+                    //check if a duplicate query was created
+                    //yes - replace id
+                    //no - 
+                    //create duplicate
+                    //register in duplicates array
+                    //replace in dashboardObject
+                }); //foreach
+                return [2 /*return*/];
+            });
+        });
+    }; //createNewDashboardObject
     Main.prototype.runBaseOnConfigFIle = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -247,7 +284,7 @@ var Main = /** @class */ (function () {
     }; //runBaseOnConfigFIle
     Main.prototype.main = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var azureParams, projectList, inputFrom, selectedProjectFrom, dashBoardList, selectedDashboard, dashBoardDetails, selectedProjectTo;
+            var azureParams, projectList, inputFrom, selectedProjectFrom, dashBoardList, selectedDashboard, dashBoardDetails, isCloneQueries, selectedProjectTo;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.printappHeader("DashBoard - Copy Tool")];
@@ -262,28 +299,35 @@ var Main = /** @class */ (function () {
                         return [4 /*yield*/, this.inputfromSelect()];
                     case 4:
                         inputFrom = _a.sent();
-                        if (!(inputFrom === 'list')) return [3 /*break*/, 11];
-                        return [4 /*yield*/, this.selectFromList(projectList, 'project to copy from:')];
+                        if (!(inputFrom === 'list')) return [3 /*break*/, 13];
+                        return [4 /*yield*/, this.selectFromList(projectList, 'Please select a project to copy from:')];
                     case 5:
                         selectedProjectFrom = _a.sent();
                         return [4 /*yield*/, this.getDashboardList(selectedProjectFrom.name)];
                     case 6:
                         dashBoardList = _a.sent();
-                        return [4 /*yield*/, this.selectFromList(dashBoardList, 'dashboard to copy:')];
+                        return [4 /*yield*/, this.selectFromList(dashBoardList, 'Please select a dashboard to copy:')];
                     case 7:
                         selectedDashboard = _a.sent();
                         return [4 /*yield*/, this.getDashboardData(selectedProjectFrom.name, selectedDashboard.id)];
                     case 8:
                         dashBoardDetails = _a.sent();
-                        return [4 /*yield*/, this.selectFromList(projectList, 'project to copy from:')];
+                        return [4 /*yield*/, this.selectFromList([{ name: 'Yes' }, { name: 'No' }], 'Do you want to clone all dashboard queries?')];
                     case 9:
-                        selectedProjectTo = _a.sent();
-                        return [4 /*yield*/, this.copyDashboard(selectedProjectTo.name, dashBoardDetails)];
+                        isCloneQueries = _a.sent();
+                        return [4 /*yield*/, this.selectFromList(projectList, 'Please select a project to copy from:')];
                     case 10:
+                        selectedProjectTo = _a.sent();
+                        if (!(isCloneQueries.name === 'Yes')) return [3 /*break*/, 12];
+                        return [4 /*yield*/, this.createNewDashboardObject(dashBoardDetails)];
+                    case 11:
                         _a.sent();
+                        _a.label = 12;
+                    case 12:
+                        // await this.copyDashboard(selectedProjectTo.name,dashBoardDetails);
                         console.log("Thanks for using if you like please add a star on github");
-                        return [3 /*break*/, 11];
-                    case 11: return [2 /*return*/];
+                        return [3 /*break*/, 13];
+                    case 13: return [2 /*return*/];
                 }
             });
         });
@@ -291,3 +335,4 @@ var Main = /** @class */ (function () {
     return Main;
 }()); //class
 exports.default = Main;
+//# sourceMappingURL=Main.js.map

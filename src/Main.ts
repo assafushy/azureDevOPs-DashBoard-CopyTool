@@ -122,11 +122,47 @@ async selectFromList(list : any, actionToSelect : string){
   let selected : any;
   let titles : any = await Promise.all(list.map((item : any)=>{return item.name}));
   selected = await inquirer.prompt([{"type":"list","name":"selected",
-  "message":`Please select a ${actionToSelect}`,
+  "message":actionToSelect,
   "choices":titles}]);
   let i = _.findIndex(list,(item : any)=>{return item.name === selected.selected})
   return(list[i]);   
 }//selectFromList
+
+async createNewDashboardObject(dashboardObject:any){
+  //iterate Dashboards Widgets
+  dashboardObject.widgets.forEach((widget : any) => { 
+    //get Settings property
+    console.log(`\n widget setting:`)
+    console.log(widget.settings);
+    
+    //all known cases:
+    console.log(widget.settings.queryId)
+    if(widget.settings.queryId){
+      console.log(`found queryId: ${widget.settings.queryId}`);
+    }//if
+    if(widget.settings.query){
+      if(widget.settings.query.queryId){
+        console.log(`found query.queryId: ${widget.settings.query.queryId}`);
+      }//if
+    }//if
+    if(widget.settings.groupKey){
+      console.log(`found groupKey: ${widget.settings.groupKey}`);
+    }//if
+    if(widget.settings.transformOptions){
+      if(widget.settings.transformOptions.filter){
+        console.log(`found transformOptions.filter: ${widget.settings.transformOptions.filter}`);
+      }//if
+    }//if
+    
+    //check if a duplicate query was created
+    //yes - replace id
+    //no - 
+    //create duplicate
+    //register in duplicates array
+    //replace in dashboardObject
+  });//foreach
+  }//createNewDashboardObject
+
 
 async runBaseOnConfigFIle(){
   //  //if via config file
@@ -152,12 +188,16 @@ async main(){
   let projectList = await this.connectToAzureDevops(azureParams.baseUrl,azureParams.PAT);
   let inputFrom = await this.inputfromSelect();
   if(inputFrom === 'list'){
-    let selectedProjectFrom = await this.selectFromList(projectList,'project to copy from:' );
+    let selectedProjectFrom = await this.selectFromList(projectList,'Please select a project to copy from:' );
     let dashBoardList = await this.getDashboardList(selectedProjectFrom.name);
-    let selectedDashboard = await this.selectFromList(dashBoardList,'dashboard to copy:');
+    let selectedDashboard = await this.selectFromList(dashBoardList,'Please select a dashboard to copy:');
     let dashBoardDetails = await this.getDashboardData(selectedProjectFrom.name,selectedDashboard.id);
-    let selectedProjectTo = await this.selectFromList(projectList,'project to copy from:' );
-    await this.copyDashboard(selectedProjectTo.name,dashBoardDetails);
+    let isCloneQueries = await this.selectFromList([{name:'Yes'},{name:'No'}],'Do you want to clone all dashboard queries?');
+    let selectedProjectTo = await this.selectFromList(projectList,'Please select a project to copy from:' );
+    if(isCloneQueries.name === 'Yes'){
+      await this.createNewDashboardObject(dashBoardDetails);
+    }
+    // await this.copyDashboard(selectedProjectTo.name,dashBoardDetails);
     console.log(`Thanks for using if you like please add a star on github`);
   }else{
     //run base on config file

@@ -77,6 +77,83 @@ var AzureREST = /** @class */ (function () {
             });
         });
     }; //getProjectList
+    //fetch Query folder by path
+    AzureREST.prototype.getQueryFolder = function (projectName, folderPath) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, axios_1.default.get(this.rootUrl + "/" + projectName + "/_apis/wit/queries/" + folderPath + "?$expand=all")];
+            });
+        });
+    }; //getProjectList
+    //fetch Query data by id
+    AzureREST.prototype.getQueryData = function (projectName, queryId) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, axios_1.default.get(this.rootUrl + "/" + projectName + "/_apis/wit/queries/" + queryId + "?$expand=all")];
+            });
+        });
+    }; //getProjectList
+    //creates a query
+    AzureREST.prototype.createQuery = function (projectName, queryObject, queryPath) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, axios_1.default.post(this.rootUrl + "/" + projectName + "/_apis/wit/queries/" + queryPath + "?api-version=4.1", queryObject)];
+            });
+        });
+    }; //getProjectList
+    //creates folder structure
+    AzureREST.prototype.createQueryPath = function (projectName, queryPath) {
+        return __awaiter(this, void 0, void 0, function () {
+            var foldersByOrder, currentFolderToCheck, currentFolderCreatePath, i, res, error_1, res_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        foldersByOrder = queryPath.split("/");
+                        console.log(foldersByOrder);
+                        currentFolderToCheck = '';
+                        currentFolderCreatePath = '';
+                        i = 0;
+                        _a.label = 1;
+                    case 1:
+                        if (!(i < foldersByOrder.length - 1)) return [3 /*break*/, 8];
+                        res = void 0;
+                        currentFolderToCheck += foldersByOrder[i] + "/";
+                        _a.label = 2;
+                    case 2:
+                        _a.trys.push([2, 4, , 6]);
+                        return [4 /*yield*/, this.getQueryFolder(projectName, currentFolderToCheck)];
+                    case 3:
+                        res = _a.sent();
+                        return [3 /*break*/, 6];
+                    case 4:
+                        error_1 = _a.sent();
+                        res_1 = void 0;
+                        console.log(error_1.response.data);
+                        return [4 /*yield*/, this.createQuery(projectName, { "name": foldersByOrder[i], "isFolder": true }, currentFolderCreatePath)];
+                    case 5:
+                        //ADD ERROR HANDLING
+                        res_1 = _a.sent();
+                        return [3 /*break*/, 6];
+                    case 6:
+                        currentFolderCreatePath += foldersByOrder[i] + "/";
+                        _a.label = 7;
+                    case 7:
+                        i++;
+                        return [3 /*break*/, 1];
+                    case 8: return [2 /*return*/, currentFolderCreatePath];
+                }
+            });
+        });
+    }; //createQueryPath
+    AzureREST.prototype.getQueryListFromDashboard = function (dashboardObject) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                console.log(dashboardObject);
+                return [2 /*return*/];
+            });
+        });
+    };
     return AzureREST;
 }()); //class
 exports.default = AzureREST;
+//# sourceMappingURL=AzureREST.js.map
