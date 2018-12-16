@@ -1,5 +1,6 @@
 import azureREST from './AzureREST';
 import _ from 'lodash';
+import { stringify } from 'querystring';
 var inquirer = require('inquirer');
 var figlet = require('figlet');
 var chalk = require('chalk');
@@ -93,8 +94,8 @@ async copyDashboard(projectToName : string , dashboardObject : any){
   try{
       res = await this.restClient.createDashboard(projectToName,dashboardObject);
   }catch(error){
-    console.error("Error fetching TeamProjects - please check --  baseURL and your PAT");
-    console.log(error.response);
+    console.error("Error copying dashboard - please check --  baseURL and your PAT");
+    // console.log(error.response.data);
   }//try
 }//copyDashboard
 
@@ -128,40 +129,133 @@ async selectFromList(list : any, actionToSelect : string){
   return(list[i]);   
 }//selectFromList
 
-async createNewDashboardObject(dashboardObject:any){
+async createNewDashboardObject(dashboardObject:any, fromProject : string, destProject :string){
+  let queryStack : any[] = [];
+  let updatedWidgetArray : any[] = [];
+  //create dashboard query path
+  let destQueryPath = await this.restClient.createQueryPath(destProject,`/Shared Queries/Dashboards/${dashboardObject.name}/XXX`);
+ 
   //iterate Dashboards Widgets
-  dashboardObject.widgets.forEach((widget : any) => { 
+  await Promise.all(dashboardObject.widgets.map(async (widget : any) => { 
     //get Settings property
-    console.log(`\n widget setting:`)
-    console.log(widget.settings);
-    
+   
     //all known cases:
-    console.log(widget.settings.queryId)
-    if(widget.settings.queryId){
-      console.log(`found queryId: ${widget.settings.queryId}`);
+    let jsonSettings = JSON.parse(widget.settings);  
+    
+    if(jsonSettings.queryId){
+      console.log(`found queryId: ${jsonSettings.queryId}`);
+      //check query stack if the query has been copied already
+      let i = _.findIndex(queryStack,(o)=>o.oldQueryId === jsonSettings.queryId);
+      if(i===-1){
+        //get query data
+        let queryData = await this.restClient.getQueryData(fromProject,jsonSettings.queryId);
+        let queryObject = {"name":queryData.data.name,"wiql":queryData.data.wiql};
+        //create query data under folder path
+        let res = await this.restClient.createQuery(destProject,queryObject,destQueryPath);
+        //add new old and new query to query stack
+        try{
+        queryStack.push({oldQueryId:jsonSettings.queryId,newQueryId:res.data.id});
+        }catch(error){
+          console.log(`cought error queryId: ${error}`);
+        }
+        //replace the queryId with the new query
+        jsonSettings.queryId = res.data.id;
+        widget.settings = JSON.stringify(jsonSettings);
+      }else{
+        //replace the queryId with the new query
+        jsonSettings.queryId = queryStack[i].newQueryId;
+        widget.settings = JSON.stringify(jsonSettings);
+      }
     }//if
-    if(widget.settings.query){
-      if(widget.settings.query.queryId){
-        console.log(`found query.queryId: ${widget.settings.query.queryId}`);
+    if(jsonSettings.query){
+      if(jsonSettings.query.queryId){
+        console.log(`found query.queryId: ${jsonSettings.query.queryId}`);
+        //check query stack if the query has been copied already
+        let i = _.findIndex(queryStack,(o)=>o.oldQueryId === jsonSettings.query.queryId);
+        if(i===-1){
+          //get query data
+          let queryData = await this.restClient.getQueryData(fromProject,jsonSettings.query.queryId);
+          let queryObject = {"name":queryData.data.name,"wiql":queryData.data.wiql};
+          //create query data under folder path
+          let res = await this.restClient.createQuery(destProject,queryObject,destQueryPath);
+          //add new old and new query to query stack
+          try{
+          queryStack.push({oldQueryId:jsonSettings.query.queryId,newQueryId:res.data.id});
+          }catch(error){
+            console.log(`cought error query.queryId: ${error}`);
+          }
+          //replace the queryId with the new query
+          jsonSettings.query.queryId = res.data.id;
+          widget.settings = JSON.stringify(jsonSettings);
+        }else{
+          //replace the queryId with the new query
+          jsonSettings.query.queryId = queryStack[i].newQueryId;
+          widget.settings = JSON.stringify(jsonSettings);
+        }
       }//if
     }//if
-    if(widget.settings.groupKey){
-      console.log(`found groupKey: ${widget.settings.groupKey}`);
+    if(jsonSettings.groupKey){
+      console.log(`found groupKey: ${jsonSettings.groupKey}`);
+      //check query stack if the query has been copied already
+      let i = _.findIndex(queryStack,(o)=>o.oldQueryId === jsonSettings.groupKey);
+      if(i===-1){
+        //get query data
+        let queryData = await this.restClient.getQueryData(fromProject,jsonSettings.groupKey);
+        let queryObject = {"name":queryData.data.name,"wiql":queryData.data.wiql};
+        //create query data under folder path
+        let res = await this.restClient.createQuery(destProject,queryObject,destQueryPath);
+        //add new old and new query to query stack
+        try{
+          queryStack.push({oldQueryId:jsonSettings.groupKey,newQueryId:res.data.id});
+        }catch(error){
+          console.log(`cought error groupKey: ${error}`);
+        }
+        //replace the queryId with the new query
+        jsonSettings.groupKey = res.data.id;
+        widget.settings = JSON.stringify(jsonSettings);
+      }else{
+        //replace the queryId with the new query
+        jsonSettings.groupKey = queryStack[i].newQueryId;
+        widget.settings = JSON.stringify(jsonSettings);
+      }
     }//if
-    if(widget.settings.transformOptions){
-      if(widget.settings.transformOptions.filter){
-        console.log(`found transformOptions.filter: ${widget.settings.transformOptions.filter}`);
+    if(jsonSettings.transformOptions){
+      if(jsonSettings.transformOptions.filter){
+        console.log(`found transformOptions.filter: ${jsonSettings.transformOptions.filter}`);
+        //check query stack if the query has been copied already
+      let i = _.findIndex(queryStack,(o)=>o.oldQueryId === jsonSettings.transformOptions.filter);
+      if(i===-1){
+        //get query data
+        let queryData = await this.restClient.getQueryData(fromProject,jsonSettings.transformOptions.filter);
+        let queryObject = {"name":queryData.data.name,"wiql":queryData.data.wiql};
+        //create query data under folder path
+        let res = await this.restClient.createQuery(destProject,queryObject,destQueryPath);
+        //add new old and new query to query stack
+        try{
+          queryStack.push({oldQueryId:jsonSettings.transformOptions.filter,newQueryId:res.data.id});
+        }catch(error){
+          console.log(`cought error: ${error}`);
+        }
+        //replace the queryId with the new query
+        jsonSettings.transformOptions.filter = res.data.id;
+        widget.settings = JSON.stringify(jsonSettings);
+      }else{
+        //replace the queryId with the new query
+        jsonSettings.transformOptions.filter = queryStack[i].newQueryId;
+        widget.settings = JSON.stringify(jsonSettings);
+      }//if
       }//if
     }//if
     
-    //check if a duplicate query was created
-    //yes - replace id
-    //no - 
-    //create duplicate
-    //register in duplicates array
     //replace in dashboardObject
-  });//foreach
-  }//createNewDashboardObject
+    updatedWidgetArray.push(widget);
+  }));//Promise.all
+  // console.log(updatedWidgetArray);
+  dashboardObject.widgets = updatedWidgetArray;
+
+  return dashboardObject;
+ 
+}//createNewDashboardObject
 
 
 async runBaseOnConfigFIle(){
@@ -195,13 +289,16 @@ async main(){
     let isCloneQueries = await this.selectFromList([{name:'Yes'},{name:'No'}],'Do you want to clone all dashboard queries?');
     let selectedProjectTo = await this.selectFromList(projectList,'Please select a project to copy from:' );
     if(isCloneQueries.name === 'Yes'){
-      await this.createNewDashboardObject(dashBoardDetails);
+      let updatedDashBoardObject = await this.createNewDashboardObject(dashBoardDetails,selectedProjectFrom.name,selectedProjectTo.name);
+      // console.log(updatedDashBoardObject);
+      await this.copyDashboard(selectedProjectTo.name,updatedDashBoardObject);
+    }else{
+      await this.copyDashboard(selectedProjectTo.name,dashBoardDetails);
     }
-    // await this.copyDashboard(selectedProjectTo.name,dashBoardDetails);
-    console.log(`Thanks for using if you like please add a star on github`);
+    
   }else{
     //run base on config file
   }//if
+  console.log(`Thanks for using if you like please add a star on github`);
 }//main
-
 }//class

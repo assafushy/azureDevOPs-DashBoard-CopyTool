@@ -109,7 +109,6 @@ var AzureREST = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         foldersByOrder = queryPath.split("/");
-                        console.log(foldersByOrder);
                         currentFolderToCheck = '';
                         currentFolderCreatePath = '';
                         i = 0;
@@ -128,7 +127,6 @@ var AzureREST = /** @class */ (function () {
                     case 4:
                         error_1 = _a.sent();
                         res_1 = void 0;
-                        console.log(error_1.response.data);
                         return [4 /*yield*/, this.createQuery(projectName, { "name": foldersByOrder[i], "isFolder": true }, currentFolderCreatePath)];
                     case 5:
                         //ADD ERROR HANDLING
@@ -145,14 +143,6 @@ var AzureREST = /** @class */ (function () {
             });
         });
     }; //createQueryPath
-    AzureREST.prototype.getQueryListFromDashboard = function (dashboardObject) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                console.log(dashboardObject);
-                return [2 /*return*/];
-            });
-        });
-    };
     return AzureREST;
 }()); //class
 exports.default = AzureREST;

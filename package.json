@@ -22,6 +22,7 @@
     "@types/node": "^10.12.15",
     "axios": "^0.18.0",
     "chalk": "^2.4.1",
+    "circular-json": "^0.5.9",
     "figlet": "^1.2.1",
     "inquirer": "^6.2.1",
     "lodash": "^4.17.11"

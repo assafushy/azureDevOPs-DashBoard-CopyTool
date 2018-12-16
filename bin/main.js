@@ -186,8 +186,7 @@ var Main = /** @class */ (function () {
                         return [3 /*break*/, 4];
                     case 3:
                         error_4 = _a.sent();
-                        console.error("Error fetching TeamProjects - please check --  baseURL and your PAT");
-                        console.log(error_4.response);
+                        console.error("Error copying dashboard - please check --  baseURL and your PAT");
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
                 }
@@ -238,40 +237,152 @@ var Main = /** @class */ (function () {
             });
         });
     }; //selectFromList
-    Main.prototype.createNewDashboardObject = function (dashboardObject) {
+    Main.prototype.createNewDashboardObject = function (dashboardObject, fromProject, destProject) {
         return __awaiter(this, void 0, void 0, function () {
+            var queryStack, updatedWidgetArray, destQueryPath;
+            var _this = this;
             return __generator(this, function (_a) {
-                //iterate Dashboards Widgets
-                dashboardObject.widgets.forEach(function (widget) {
-                    //get Settings property
-                    console.log("\n widget setting:");
-                    console.log(widget.settings);
-                    //all known cases:
-                    console.log(widget.settings.queryId);
-                    if (widget.settings.queryId) {
-                        console.log("found queryId: " + widget.settings.queryId);
-                    } //if
-                    if (widget.settings.query) {
-                        if (widget.settings.query.queryId) {
-                            console.log("found query.queryId: " + widget.settings.query.queryId);
-                        } //if
-                    } //if
-                    if (widget.settings.groupKey) {
-                        console.log("found groupKey: " + widget.settings.groupKey);
-                    } //if
-                    if (widget.settings.transformOptions) {
-                        if (widget.settings.transformOptions.filter) {
-                            console.log("found transformOptions.filter: " + widget.settings.transformOptions.filter);
-                        } //if
-                    } //if
-                    //check if a duplicate query was created
-                    //yes - replace id
-                    //no - 
-                    //create duplicate
-                    //register in duplicates array
-                    //replace in dashboardObject
-                }); //foreach
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0:
+                        queryStack = [];
+                        updatedWidgetArray = [];
+                        return [4 /*yield*/, this.restClient.createQueryPath(destProject, "/Shared Queries/Dashboards/" + dashboardObject.name + "/XXX")];
+                    case 1:
+                        destQueryPath = _a.sent();
+                        //iterate Dashboards Widgets
+                        return [4 /*yield*/, Promise.all(dashboardObject.widgets.map(function (widget) { return __awaiter(_this, void 0, void 0, function () {
+                                var jsonSettings, i, queryData, queryObject, res, i, queryData, queryObject, res, i, queryData, queryObject, res, i, queryData, queryObject, res;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            jsonSettings = JSON.parse(widget.settings);
+                                            if (!jsonSettings.queryId) return [3 /*break*/, 4];
+                                            console.log("found queryId: " + jsonSettings.queryId);
+                                            i = lodash_1.default.findIndex(queryStack, function (o) { return o.oldQueryId === jsonSettings.queryId; });
+                                            if (!(i === -1)) return [3 /*break*/, 3];
+                                            return [4 /*yield*/, this.restClient.getQueryData(fromProject, jsonSettings.queryId)];
+                                        case 1:
+                                            queryData = _a.sent();
+                                            queryObject = { "name": queryData.data.name, "wiql": queryData.data.wiql };
+                                            return [4 /*yield*/, this.restClient.createQuery(destProject, queryObject, destQueryPath)];
+                                        case 2:
+                                            res = _a.sent();
+                                            //add new old and new query to query stack
+                                            try {
+                                                queryStack.push({ oldQueryId: jsonSettings.queryId, newQueryId: res.data.id });
+                                            }
+                                            catch (error) {
+                                                console.log("cought error queryId: " + error);
+                                            }
+                                            //replace the queryId with the new query
+                                            jsonSettings.queryId = res.data.id;
+                                            widget.settings = JSON.stringify(jsonSettings);
+                                            return [3 /*break*/, 4];
+                                        case 3:
+                                            //replace the queryId with the new query
+                                            jsonSettings.queryId = queryStack[i].newQueryId;
+                                            widget.settings = JSON.stringify(jsonSettings);
+                                            _a.label = 4;
+                                        case 4:
+                                            if (!jsonSettings.query) return [3 /*break*/, 8];
+                                            if (!jsonSettings.query.queryId) return [3 /*break*/, 8];
+                                            console.log("found query.queryId: " + jsonSettings.query.queryId);
+                                            i = lodash_1.default.findIndex(queryStack, function (o) { return o.oldQueryId === jsonSettings.query.queryId; });
+                                            if (!(i === -1)) return [3 /*break*/, 7];
+                                            return [4 /*yield*/, this.restClient.getQueryData(fromProject, jsonSettings.query.queryId)];
+                                        case 5:
+                                            queryData = _a.sent();
+                                            queryObject = { "name": queryData.data.name, "wiql": queryData.data.wiql };
+                                            return [4 /*yield*/, this.restClient.createQuery(destProject, queryObject, destQueryPath)];
+                                        case 6:
+                                            res = _a.sent();
+                                            //add new old and new query to query stack
+                                            try {
+                                                queryStack.push({ oldQueryId: jsonSettings.query.queryId, newQueryId: res.data.id });
+                                            }
+                                            catch (error) {
+                                                console.log("cought error query.queryId: " + error);
+                                            }
+                                            //replace the queryId with the new query
+                                            jsonSettings.query.queryId = res.data.id;
+                                            widget.settings = JSON.stringify(jsonSettings);
+                                            return [3 /*break*/, 8];
+                                        case 7:
+                                            //replace the queryId with the new query
+                                            jsonSettings.query.queryId = queryStack[i].newQueryId;
+                                            widget.settings = JSON.stringify(jsonSettings);
+                                            _a.label = 8;
+                                        case 8:
+                                            if (!jsonSettings.groupKey) return [3 /*break*/, 12];
+                                            console.log("found groupKey: " + jsonSettings.groupKey);
+                                            i = lodash_1.default.findIndex(queryStack, function (o) { return o.oldQueryId === jsonSettings.groupKey; });
+                                            if (!(i === -1)) return [3 /*break*/, 11];
+                                            return [4 /*yield*/, this.restClient.getQueryData(fromProject, jsonSettings.groupKey)];
+                                        case 9:
+                                            queryData = _a.sent();
+                                            queryObject = { "name": queryData.data.name, "wiql": queryData.data.wiql };
+                                            return [4 /*yield*/, this.restClient.createQuery(destProject, queryObject, destQueryPath)];
+                                        case 10:
+                                            res = _a.sent();
+                                            //add new old and new query to query stack
+                                            try {
+                                                queryStack.push({ oldQueryId: jsonSettings.groupKey, newQueryId: res.data.id });
+                                            }
+                                            catch (error) {
+                                                console.log("cought error groupKey: " + error);
+                                            }
+                                            //replace the queryId with the new query
+                                            jsonSettings.groupKey = res.data.id;
+                                            widget.settings = JSON.stringify(jsonSettings);
+                                            return [3 /*break*/, 12];
+                                        case 11:
+                                            //replace the queryId with the new query
+                                            jsonSettings.groupKey = queryStack[i].newQueryId;
+                                            widget.settings = JSON.stringify(jsonSettings);
+                                            _a.label = 12;
+                                        case 12:
+                                            if (!jsonSettings.transformOptions) return [3 /*break*/, 16];
+                                            if (!jsonSettings.transformOptions.filter) return [3 /*break*/, 16];
+                                            console.log("found transformOptions.filter: " + jsonSettings.transformOptions.filter);
+                                            i = lodash_1.default.findIndex(queryStack, function (o) { return o.oldQueryId === jsonSettings.transformOptions.filter; });
+                                            if (!(i === -1)) return [3 /*break*/, 15];
+                                            return [4 /*yield*/, this.restClient.getQueryData(fromProject, jsonSettings.transformOptions.filter)];
+                                        case 13:
+                                            queryData = _a.sent();
+                                            queryObject = { "name": queryData.data.name, "wiql": queryData.data.wiql };
+                                            return [4 /*yield*/, this.restClient.createQuery(destProject, queryObject, destQueryPath)];
+                                        case 14:
+                                            res = _a.sent();
+                                            //add new old and new query to query stack
+                                            try {
+                                                queryStack.push({ oldQueryId: jsonSettings.transformOptions.filter, newQueryId: res.data.id });
+                                            }
+                                            catch (error) {
+                                                console.log("cought error: " + error);
+                                            }
+                                            //replace the queryId with the new query
+                                            jsonSettings.transformOptions.filter = res.data.id;
+                                            widget.settings = JSON.stringify(jsonSettings);
+                                            return [3 /*break*/, 16];
+                                        case 15:
+                                            //replace the queryId with the new query
+                                            jsonSettings.transformOptions.filter = queryStack[i].newQueryId;
+                                            widget.settings = JSON.stringify(jsonSettings);
+                                            _a.label = 16;
+                                        case 16:
+                                            //replace in dashboardObject
+                                            updatedWidgetArray.push(widget);
+                                            return [2 /*return*/];
+                                    }
+                                });
+                            }); }))];
+                    case 2:
+                        //iterate Dashboards Widgets
+                        _a.sent(); //Promise.all
+                        // console.log(updatedWidgetArray);
+                        dashboardObject.widgets = updatedWidgetArray;
+                        return [2 /*return*/, dashboardObject];
+                }
             });
         });
     }; //createNewDashboardObject
@@ -284,7 +395,7 @@ var Main = /** @class */ (function () {
     }; //runBaseOnConfigFIle
     Main.prototype.main = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var azureParams, projectList, inputFrom, selectedProjectFrom, dashBoardList, selectedDashboard, dashBoardDetails, isCloneQueries, selectedProjectTo;
+            var azureParams, projectList, inputFrom, selectedProjectFrom, dashBoardList, selectedDashboard, dashBoardDetails, isCloneQueries, selectedProjectTo, updatedDashBoardObject;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.printappHeader("DashBoard - Copy Tool")];
@@ -299,7 +410,7 @@ var Main = /** @class */ (function () {
                         return [4 /*yield*/, this.inputfromSelect()];
                     case 4:
                         inputFrom = _a.sent();
-                        if (!(inputFrom === 'list')) return [3 /*break*/, 13];
+                        if (!(inputFrom === 'list')) return [3 /*break*/, 16];
                         return [4 /*yield*/, this.selectFromList(projectList, 'Please select a project to copy from:')];
                     case 5:
                         selectedProjectFrom = _a.sent();
@@ -318,16 +429,24 @@ var Main = /** @class */ (function () {
                         return [4 /*yield*/, this.selectFromList(projectList, 'Please select a project to copy from:')];
                     case 10:
                         selectedProjectTo = _a.sent();
-                        if (!(isCloneQueries.name === 'Yes')) return [3 /*break*/, 12];
-                        return [4 /*yield*/, this.createNewDashboardObject(dashBoardDetails)];
+                        if (!(isCloneQueries.name === 'Yes')) return [3 /*break*/, 13];
+                        return [4 /*yield*/, this.createNewDashboardObject(dashBoardDetails, selectedProjectFrom.name, selectedProjectTo.name)];
                     case 11:
-                        _a.sent();
-                        _a.label = 12;
+                        updatedDashBoardObject = _a.sent();
+                        // console.log(updatedDashBoardObject);
+                        return [4 /*yield*/, this.copyDashboard(selectedProjectTo.name, updatedDashBoardObject)];
                     case 12:
-                        // await this.copyDashboard(selectedProjectTo.name,dashBoardDetails);
+                        // console.log(updatedDashBoardObject);
+                        _a.sent();
+                        return [3 /*break*/, 15];
+                    case 13: return [4 /*yield*/, this.copyDashboard(selectedProjectTo.name, dashBoardDetails)];
+                    case 14:
+                        _a.sent();
+                        _a.label = 15;
+                    case 15: return [3 /*break*/, 16];
+                    case 16:
                         console.log("Thanks for using if you like please add a star on github");
-                        return [3 /*break*/, 13];
-                    case 13: return [2 /*return*/];
+                        return [2 /*return*/];
                 }
             });
         });

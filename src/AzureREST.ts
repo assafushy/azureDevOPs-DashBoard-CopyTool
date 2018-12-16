@@ -35,7 +35,6 @@ export default class AzureREST{
     return axios.get(`${this.rootUrl}/${projectName}/_apis/wit/queries/${folderPath}?$expand=all`);
   }//getProjectList
 
-
   //fetch Query data by id
   async getQueryData(projectName :string ,queryId : string){ 
     return axios.get(`${this.rootUrl}/${projectName}/_apis/wit/queries/${queryId}?$expand=all`);
@@ -49,7 +48,6 @@ export default class AzureREST{
   //creates folder structure
   async createQueryPath(projectName:string,queryPath : string){
     let foldersByOrder = queryPath.split("/");
-    console.log(foldersByOrder);
     let currentFolderToCheck :string = '';
     let currentFolderCreatePath : string ='';
     
@@ -60,7 +58,6 @@ export default class AzureREST{
           res = await this.getQueryFolder(projectName,currentFolderToCheck);
         }catch(error){
           let res:any;
-          console.log(error.response.data);
           //ADD ERROR HANDLING
           res = await this.createQuery(projectName,{"name":foldersByOrder[i],"isFolder": true},currentFolderCreatePath);
         }
@@ -69,7 +66,4 @@ export default class AzureREST{
     return currentFolderCreatePath;
   }//createQueryPath
 
-  async getQueryListFromDashboard(dashboardObject : any){
-    console.log(dashboardObject);
-  } 
 }//class
