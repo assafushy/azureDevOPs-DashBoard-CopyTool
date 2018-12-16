@@ -6,3 +6,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Main_1 = __importDefault(require("./Main"));
 var mainThread = new Main_1.default();
 mainThread.main();
+//buildDefenitions - not supported
+//# sourceMappingURL=index.js.map
