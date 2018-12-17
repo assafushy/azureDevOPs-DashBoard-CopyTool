@@ -1,6 +1,5 @@
+#!/usr/bin/env node
 import Main from './Main';
-import AzureREST from './AzureREST';
-
 
 
 let mainThread = new Main();

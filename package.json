@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "/bin/node index.js"
+    "start": "node ./bin/index.js"
   },
   "repository": {
     "type": "git",
@@ -13,6 +13,10 @@
   },
   "author": "Assaf Yacobi",
   "license": "MIT",
+  "preferGlobal": true,
+  "bin": {
+    "copyDash": "./bin/index.js"
+  },
   "bugs": {
     "url": "https://github.com/assafushy/azureDevOPs-DashBoard-CopyTool/issues"
   },
