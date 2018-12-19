@@ -1,4 +1,4 @@
-# azureDevOPs-DashBoard-CopyTool
+# azureDevOps-DashBoard-CopyTool
 
 NodeJS CLI for copying dashboards and their queries between team project.
 
