@@ -1,6 +1,5 @@
 import azureREST from './AzureREST';
 import _ from 'lodash';
-import { stringify } from 'querystring';
 var inquirer = require('inquirer');
 var figlet = require('figlet');
 var chalk = require('chalk');
@@ -100,13 +99,13 @@ async copyDashboard(projectToName : string , dashboardObject : any){
 
 async inputfromSelect(){
   let answer = await inquirer.prompt([{"type":"list","name":"selectType",
-  "message":"How do you want to pass your connection data ?",
-  "choices":["Select from list","JSON Config file"]}]);
+  "message":"How do you want to pass your dashboard copy information?",
+  "choices":["Select from list","From original JSON Config file"]}]);
   switch(answer.selectType){
     case 'Select from list':{
       return 'list';
     }
-    case 'JSON Config file':{
+    case 'From original JSON Config file':{
       console.log(`Please make sure before you proceed, that your config file cantains the following properties:
       {
         projectFrom:<your project to copy from name>,
