@@ -265,6 +265,7 @@ var Main = /** @class */ (function () {
                                     switch (_a.label) {
                                         case 0:
                                             jsonSettings = JSON.parse(widget.settings);
+                                            if (!jsonSettings) return [3 /*break*/, 16];
                                             if (!jsonSettings.queryId) return [3 /*break*/, 4];
                                             i = lodash_1.default.findIndex(queryStack, function (o) { return o.oldQueryId === jsonSettings.queryId; });
                                             if (!(i === -1)) return [3 /*break*/, 3];
