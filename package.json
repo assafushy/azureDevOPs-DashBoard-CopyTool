@@ -1,6 +1,6 @@
 {
   "name": "azuredevops-dashboard-copytool",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A CLI tool for copying dashboards in azure devops",
   "main": "index.js",
   "engines": {
