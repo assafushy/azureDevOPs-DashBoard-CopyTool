@@ -200,15 +200,15 @@ var Main = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, inquirer.prompt([{ "type": "list", "name": "selectType",
-                                "message": "How do you want to pass your connection data ?",
-                                "choices": ["Select from list", "JSON Config file"] }])];
+                                "message": "How do you want to pass your dashboard copy information?",
+                                "choices": ["Select from list", "From original JSON Config file"] }])];
                     case 1:
                         answer = _a.sent();
                         switch (answer.selectType) {
                             case 'Select from list': {
                                 return [2 /*return*/, 'list'];
                             }
-                            case 'JSON Config file': {
+                            case 'From original JSON Config file': {
                                 console.log("Please make sure before you proceed, that your config file cantains the following properties:\n      {\n        projectFrom:<your project to copy from name>,\n        dashboardFrom:<your dashboard or dashboards to copy from name>\n      } ");
                                 return [2 /*return*/, 'json'];
                             }
