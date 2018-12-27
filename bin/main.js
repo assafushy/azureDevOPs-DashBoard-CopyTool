@@ -57,12 +57,14 @@ var Main = /** @class */ (function () {
     //get connection data
     Main.prototype.getConnectionData = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var config, answer, _a, baseUrl, PAT, configPath;
+            var config, answer, _a, rootUrl, PAT, configPath;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, inquirer.prompt([{ "type": "list", "name": "selectType",
-                                "message": "How do you want to pass your connection data ?",
-                                "choices": ["Manual Typing", "JSON Config file"] }])];
+                    case 0:
+                        config = { rootUrl: '', PAT: '' };
+                        return [4 /*yield*/, inquirer.prompt([{ "type": "list", "name": "selectType",
+                                    "message": "How do you want to pass your connection data ?",
+                                    "choices": ["Manual Typing", "JSON Config file"] }])];
                     case 1:
                         answer = _b.sent();
                         _a = answer.selectType;
@@ -74,12 +76,12 @@ var Main = /** @class */ (function () {
                     case 2: return [4 /*yield*/, inquirer.prompt([{ "type": "input", "name": "rootUrl",
                                 "message": "Please type the root url:" }])];
                     case 3:
-                        baseUrl = _b.sent();
+                        rootUrl = _b.sent();
                         return [4 /*yield*/, inquirer.prompt([{ "type": "input", "name": "PAT",
                                     "message": "Please type your Personal Access Token(PAT):" }])];
                     case 4:
                         PAT = _b.sent();
-                        return [2 /*return*/, ({ "baseUrl": baseUrl, "PAT": PAT })];
+                        return [2 /*return*/, ({ "baseUrl": rootUrl.rootUrl, "PAT": PAT.PAT })];
                     case 5:
                         //if via config file
                         console.log("make sure you suppliy a JSON file path with properties: {rootUrl:***,PAT:***}");
@@ -110,6 +112,7 @@ var Main = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        console.log("Fetching data with parameters : {rootUrl:" + rootUrl + ",PAT:" + PAT + "}");
                         this.restClient = new AzureREST_1.default(rootUrl, PAT);
                         _a.label = 1;
                     case 1:

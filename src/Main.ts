@@ -1,5 +1,6 @@
 import azureREST from './AzureREST';
 import _ from 'lodash';
+import {Iconfig} from './interfaces';
 var inquirer = require('inquirer');
 var figlet = require('figlet');
 var chalk = require('chalk');
@@ -19,19 +20,20 @@ printappHeader(str : string){
 
 //get connection data
 async getConnectionData(){
-  let config:any;
+  
+  let config:Iconfig = {rootUrl:'',PAT:''};
+
   let answer = await inquirer.prompt([{"type":"list","name":"selectType",
       "message":"How do you want to pass your connection data ?",
       "choices":["Manual Typing","JSON Config file"]}]);
   switch(answer.selectType){
     case 'Manual Typing':{
       //if via manual typing
-      let baseUrl = await inquirer.prompt([{"type":"input","name":"rootUrl",
+      let rootUrl = await inquirer.prompt([{"type":"input","name":"rootUrl",
           "message":"Please type the root url:"}]);
       let PAT = await inquirer.prompt([{"type":"input","name":"PAT",
           "message":"Please type your Personal Access Token(PAT):"}]);
-      return({"baseUrl":baseUrl,"PAT":PAT});
-    break;
+      return({"baseUrl":rootUrl.rootUrl,"PAT":PAT.PAT});
     }
     case 'JSON Config file':{
       //if via config file
@@ -54,6 +56,7 @@ async getConnectionData(){
 //connect to azureDevOps and get project list
 async connectToAzureDevops(rootUrl : string,PAT : string){
   let res : any;
+  console.log(`Fetching data with parameters : {rootUrl:${rootUrl},PAT:${PAT}}`)
   this.restClient = new azureREST(rootUrl,PAT);
     try{
        res = await this.restClient.getProjectList();
