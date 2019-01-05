@@ -67,10 +67,10 @@ async connectToAzureDevops(rootUrl : string,PAT : string){
 }//connectToAzureDevops
 
 //get dashboard list
-async getDashboardList(projectName : string){
+async getDashboardList(projectName : string,teamName: string){
   let res : any;
   try{
-      res = await this.restClient.getDashboardList(projectName);
+      res = await this.restClient.getDashboardList(projectName,teamName);
   }catch(error){
     console.error("Error fetching TeamProjects - please check --  baseURL and your PAT");
   }
@@ -89,11 +89,11 @@ async getDashboardData(projectName : string,dashboardId :string){
 }//getDashboardList
 
 //copy dashboard
-async copyDashboard(projectToName : string , dashboardObject : any){
+async copyDashboard(projectToName : string ,teamToName :string, dashboardObject : any){
   let res : any;
   delete dashboardObject.id;
   try{
-      res = await this.restClient.createDashboard(projectToName,dashboardObject);
+      res = await this.restClient.createDashboard(projectToName,teamToName,dashboardObject);
   }catch(error){
     console.error("Error copying dashboard - please check --  baseURL and your PAT");
     console.log(error.response.data);
@@ -294,21 +294,24 @@ async main(){
   //let inputFrom = await this.inputfromSelect();
   if(inputFrom === 'list'){
     let selectedProjectFrom = await this.selectFromList(projectList,'Please select a project to copy from:' );
-    //SELECT TEAM FROM TEAM FROM LIST
-    let dashBoardList = await this.getDashboardList(selectedProjectFrom.name);
+    let projectFromTeamList = await this.restClient.getTeamsList(selectedProjectFrom.name);
+    let selectedTeamFrom = await this.selectFromList(projectFromTeamList.data.value,'Please select a Team to copy from:' );
+    let dashBoardList = await this.getDashboardList(selectedProjectFrom.name,selectedTeamFrom.name);
     let selectedDashboard = await this.selectFromList(dashBoardList,'Please select a dashboard to copy:');
     let dashBoardDetails = await this.getDashboardData(selectedProjectFrom.name,selectedDashboard.id);
     let isCloneQueries = await this.selectFromList([{name:'Yes'},{name:'No'}],'Do you want to clone all dashboard queries?');
     let selectedProjectTo = await this.selectFromList(projectList,'Please select a project to copy from:' );
     //SELECT TEAM FROM TEAM TO LIST
-    let selectedProjectToDashboardList = await this.getDashboardList(selectedProjectTo.name);
+    let projectToTeamList = await this.restClient.getTeamsList(selectedProjectTo.name);
+    let selectedTeamTo = await this.selectFromList(projectToTeamList.data.value,'Please select a Team to copy from:' );
+    let selectedProjectToDashboardList = await this.getDashboardList(selectedProjectTo.name,selectedTeamTo.name);
     let updatedDashBoardObject :any;
     if(isCloneQueries.name === 'Yes'){
       updatedDashBoardObject = await this.createNewDashboardObject(dashBoardDetails,selectedProjectFrom.name,selectedProjectTo.name,selectedProjectToDashboardList,true);
     }else{
       updatedDashBoardObject = await this.createNewDashboardObject(dashBoardDetails,selectedProjectFrom.name,selectedProjectTo.name,selectedProjectToDashboardList,false);
     }//if
-    await this.copyDashboard(selectedProjectTo.name,updatedDashBoardObject);
+    await this.copyDashboard(selectedProjectTo.name,selectedTeamTo.name,updatedDashBoardObject);
   }else{
     //run base on config file
   }//if

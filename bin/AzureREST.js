@@ -52,12 +52,21 @@ var AzureREST = /** @class */ (function () {
             });
         });
     }; //getProjectList
+    //fetches all teams inside a project
+    AzureREST.prototype.getTeamsList = function (projectName) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                console.log(this.rootUrl + "/_apis/projects/" + projectName + "/teams");
+                return [2 /*return*/, axios_1.default.get(this.rootUrl + "/_apis/projects/" + projectName + "/teams")];
+            });
+        });
+    }; //getProjectList
     //fetch all dashboards for a team project
-    AzureREST.prototype.getDashboardList = function (projectName) {
+    AzureREST.prototype.getDashboardList = function (projectName, teamName) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 //?api-version=5.0-preview.2
-                return [2 /*return*/, axios_1.default.get(this.rootUrl + "/" + projectName + "/_apis/dashboard/dashboards")];
+                return [2 /*return*/, axios_1.default.get(this.rootUrl + "/" + projectName + "/" + teamName + "/_apis/dashboard/dashboards")];
             });
         });
     }; //getProjectList
@@ -70,10 +79,10 @@ var AzureREST = /** @class */ (function () {
         });
     }; //getProjectList
     //creates a dashboard
-    AzureREST.prototype.createDashboard = function (projectName, dashboardObject) {
+    AzureREST.prototype.createDashboard = function (projectName, teamName, dashboardObject) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, axios_1.default.post(this.rootUrl + "/" + projectName + "/_apis/dashboard/dashboards?api-version=4.1-preview.2", dashboardObject)];
+                return [2 /*return*/, axios_1.default.post(this.rootUrl + "/" + projectName + "/" + teamName + "/_apis/dashboard/dashboards?api-version=4.1-preview.2", dashboardObject)];
             });
         });
     }; //getProjectList
