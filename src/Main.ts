@@ -290,14 +290,17 @@ async main(){
   await this.printappHeader("DashBoard - Copy Tool");
   let azureParams : any = await this.getConnectionData(); 
   let projectList = await this.connectToAzureDevops(azureParams.baseUrl,azureParams.PAT);
-  let inputFrom = await this.inputfromSelect();
+  let inputFrom = 'list';
+  //let inputFrom = await this.inputfromSelect();
   if(inputFrom === 'list'){
     let selectedProjectFrom = await this.selectFromList(projectList,'Please select a project to copy from:' );
+    //SELECT TEAM FROM TEAM FROM LIST
     let dashBoardList = await this.getDashboardList(selectedProjectFrom.name);
     let selectedDashboard = await this.selectFromList(dashBoardList,'Please select a dashboard to copy:');
     let dashBoardDetails = await this.getDashboardData(selectedProjectFrom.name,selectedDashboard.id);
     let isCloneQueries = await this.selectFromList([{name:'Yes'},{name:'No'}],'Do you want to clone all dashboard queries?');
     let selectedProjectTo = await this.selectFromList(projectList,'Please select a project to copy from:' );
+    //SELECT TEAM FROM TEAM TO LIST
     let selectedProjectToDashboardList = await this.getDashboardList(selectedProjectTo.name);
     let updatedDashBoardObject :any;
     if(isCloneQueries.name === 'Yes'){
