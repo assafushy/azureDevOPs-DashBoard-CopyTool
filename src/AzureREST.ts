@@ -13,11 +13,17 @@ export default class AzureREST{
   async getProjectList(){ 
     return axios.get(`${this.rootUrl}/_apis/projects`);
   }//getProjectList
+
+   //fetches all teams inside a project
+   async getTeamsList(projectName:string){ 
+     console.log(`${this.rootUrl}/_apis/projects/${projectName}/teams`)
+    return axios.get(`${this.rootUrl}/_apis/projects/${projectName}/teams`);
+  }//getProjectList
   
   //fetch all dashboards for a team project
-  async getDashboardList(projectName : string){ 
+  async getDashboardList(projectName : string,teamName:string){ 
     //?api-version=5.0-preview.2
-    return axios.get(`${this.rootUrl}/${projectName}/_apis/dashboard/dashboards`);
+    return axios.get(`${this.rootUrl}/${projectName}/${teamName}/_apis/dashboard/dashboards`);
   }//getProjectList
 
   //fetch  dashboard data by id
@@ -26,8 +32,8 @@ export default class AzureREST{
   }//getProjectList
 
   //creates a dashboard
-  async createDashboard(projectName :string ,dashboardObject : any){ 
-    return axios.post(`${this.rootUrl}/${projectName}/_apis/dashboard/dashboards?api-version=4.1-preview.2`,dashboardObject);
+  async createDashboard(projectName :string ,teamName :string ,dashboardObject : any){ 
+    return axios.post(`${this.rootUrl}/${projectName}/${teamName}/_apis/dashboard/dashboards?api-version=4.1-preview.2`,dashboardObject);
   }//getProjectList
 
   //fetch Query folder by path

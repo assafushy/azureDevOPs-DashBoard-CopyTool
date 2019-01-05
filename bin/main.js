@@ -131,14 +131,14 @@ var Main = /** @class */ (function () {
         });
     }; //connectToAzureDevops
     //get dashboard list
-    Main.prototype.getDashboardList = function (projectName) {
+    Main.prototype.getDashboardList = function (projectName, teamName) {
         return __awaiter(this, void 0, void 0, function () {
             var res, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.restClient.getDashboardList(projectName)];
+                        return [4 /*yield*/, this.restClient.getDashboardList(projectName, teamName)];
                     case 1:
                         res = _a.sent();
                         return [3 /*break*/, 3];
@@ -173,7 +173,7 @@ var Main = /** @class */ (function () {
         });
     }; //getDashboardList
     //copy dashboard
-    Main.prototype.copyDashboard = function (projectToName, dashboardObject) {
+    Main.prototype.copyDashboard = function (projectToName, teamToName, dashboardObject) {
         return __awaiter(this, void 0, void 0, function () {
             var res, error_4;
             return __generator(this, function (_a) {
@@ -183,7 +183,7 @@ var Main = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.restClient.createDashboard(projectToName, dashboardObject)];
+                        return [4 /*yield*/, this.restClient.createDashboard(projectToName, teamToName, dashboardObject)];
                     case 2:
                         res = _a.sent();
                         return [3 /*break*/, 4];
@@ -406,7 +406,7 @@ var Main = /** @class */ (function () {
     }; //runBaseOnConfigFIle
     Main.prototype.main = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var azureParams, projectList, inputFrom, selectedProjectFrom, dashBoardList, selectedDashboard, dashBoardDetails, isCloneQueries, selectedProjectTo, selectedProjectToDashboardList, updatedDashBoardObject;
+            var azureParams, projectList, inputFrom, selectedProjectFrom, projectFromTeamList, selectedTeamFrom, dashBoardList, selectedDashboard, dashBoardDetails, isCloneQueries, selectedProjectTo, projectToTeamList, selectedTeamTo, selectedProjectToDashboardList, updatedDashBoardObject;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.printappHeader("DashBoard - Copy Tool")];
@@ -418,47 +418,57 @@ var Main = /** @class */ (function () {
                         return [4 /*yield*/, this.connectToAzureDevops(azureParams.baseUrl, azureParams.PAT)];
                     case 3:
                         projectList = _a.sent();
-                        return [4 /*yield*/, this.inputfromSelect()];
-                    case 4:
-                        inputFrom = _a.sent();
-                        if (!(inputFrom === 'list')) return [3 /*break*/, 17];
+                        inputFrom = 'list';
+                        if (!(inputFrom === 'list')) return [3 /*break*/, 20];
                         return [4 /*yield*/, this.selectFromList(projectList, 'Please select a project to copy from:')];
-                    case 5:
+                    case 4:
                         selectedProjectFrom = _a.sent();
-                        return [4 /*yield*/, this.getDashboardList(selectedProjectFrom.name)];
+                        return [4 /*yield*/, this.restClient.getTeamsList(selectedProjectFrom.name)];
+                    case 5:
+                        projectFromTeamList = _a.sent();
+                        return [4 /*yield*/, this.selectFromList(projectFromTeamList.data.value, 'Please select a Team to copy from:')];
                     case 6:
+                        selectedTeamFrom = _a.sent();
+                        return [4 /*yield*/, this.getDashboardList(selectedProjectFrom.name, selectedTeamFrom.name)];
+                    case 7:
                         dashBoardList = _a.sent();
                         return [4 /*yield*/, this.selectFromList(dashBoardList, 'Please select a dashboard to copy:')];
-                    case 7:
+                    case 8:
                         selectedDashboard = _a.sent();
                         return [4 /*yield*/, this.getDashboardData(selectedProjectFrom.name, selectedDashboard.id)];
-                    case 8:
+                    case 9:
                         dashBoardDetails = _a.sent();
                         return [4 /*yield*/, this.selectFromList([{ name: 'Yes' }, { name: 'No' }], 'Do you want to clone all dashboard queries?')];
-                    case 9:
+                    case 10:
                         isCloneQueries = _a.sent();
                         return [4 /*yield*/, this.selectFromList(projectList, 'Please select a project to copy from:')];
-                    case 10:
-                        selectedProjectTo = _a.sent();
-                        return [4 /*yield*/, this.getDashboardList(selectedProjectTo.name)];
                     case 11:
+                        selectedProjectTo = _a.sent();
+                        return [4 /*yield*/, this.restClient.getTeamsList(selectedProjectTo.name)];
+                    case 12:
+                        projectToTeamList = _a.sent();
+                        return [4 /*yield*/, this.selectFromList(projectToTeamList.data.value, 'Please select a Team to copy from:')];
+                    case 13:
+                        selectedTeamTo = _a.sent();
+                        return [4 /*yield*/, this.getDashboardList(selectedProjectTo.name, selectedTeamTo.name)];
+                    case 14:
                         selectedProjectToDashboardList = _a.sent();
                         updatedDashBoardObject = void 0;
-                        if (!(isCloneQueries.name === 'Yes')) return [3 /*break*/, 13];
+                        if (!(isCloneQueries.name === 'Yes')) return [3 /*break*/, 16];
                         return [4 /*yield*/, this.createNewDashboardObject(dashBoardDetails, selectedProjectFrom.name, selectedProjectTo.name, selectedProjectToDashboardList, true)];
-                    case 12:
+                    case 15:
                         updatedDashBoardObject = _a.sent();
-                        return [3 /*break*/, 15];
-                    case 13: return [4 /*yield*/, this.createNewDashboardObject(dashBoardDetails, selectedProjectFrom.name, selectedProjectTo.name, selectedProjectToDashboardList, false)];
-                    case 14:
-                        updatedDashBoardObject = _a.sent();
-                        _a.label = 15;
-                    case 15: //if
-                    return [4 /*yield*/, this.copyDashboard(selectedProjectTo.name, updatedDashBoardObject)];
-                    case 16:
-                        _a.sent();
-                        return [3 /*break*/, 17];
+                        return [3 /*break*/, 18];
+                    case 16: return [4 /*yield*/, this.createNewDashboardObject(dashBoardDetails, selectedProjectFrom.name, selectedProjectTo.name, selectedProjectToDashboardList, false)];
                     case 17:
+                        updatedDashBoardObject = _a.sent();
+                        _a.label = 18;
+                    case 18: //if
+                    return [4 /*yield*/, this.copyDashboard(selectedProjectTo.name, selectedTeamTo.name, updatedDashBoardObject)];
+                    case 19:
+                        _a.sent();
+                        return [3 /*break*/, 20];
+                    case 20:
                         console.log("Thanks for using if you like please add a star on github");
                         return [2 /*return*/];
                 }
